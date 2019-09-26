@@ -1,0 +1,17 @@
+{
+  "name": "@qed/es-data-gen-js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {
+    "@elastic/elasticsearch": "^7.3.0",
+    "commander": "^3.0.1",
+    "json-schema-faker": "github:json-schema-faker/json-schema-faker#develop"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

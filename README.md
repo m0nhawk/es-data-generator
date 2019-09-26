@@ -1,5 +1,9 @@
 # `es-data-generator`
 
+`es-data-generator` is using Elasticsearch index mapping to generate documents and index them.
+
+## Usage
+
 ```
 ➜ ./main.js --help
 Usage: main [options]

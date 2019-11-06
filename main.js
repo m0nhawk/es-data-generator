@@ -13,6 +13,8 @@ program
     .option('-h, --hostname <hostname>', 'elasticsearch hostname', 'http://localhost')
     .option('-p, --port <port>', 'elasticsearch port', '9200')
     .option('-i, --index <index>', 'elasticsearch index')
+    .option('-d, --doc_type <doc_type>', 'document type', null)
+    .option('--field_value <field_value>', 'field value', null)
     .option('-n, --number <number>', 'number of documents to generate', 100)
     .option('-r, --random', 'generate random number of document up to "number"', false);
 
@@ -53,7 +55,13 @@ const schema = {
 async function run() {
     var mapping = await client.indices.getMapping({ index: es_index });
 
-    for (const [key, value] of Object.entries(mapping.body[es_index].mappings.properties)) {
+    var m = mapping.body[es_index].mappings;
+
+    if (program.doc_type) {
+        m = m[program.doc_type];
+    }
+
+    for (const [key, value] of Object.entries(m.properties)) {
         var fieldType = faker_type(value);
         schema.items.properties[key] = fieldType;
         schema.items.required.push(key);
@@ -61,8 +69,18 @@ async function run() {
 
     var sample = await resolve(schema);
 
-    const body = sample.flatMap(doc => [{ index: { _index: es_index } }, doc]);
-    // const body = sample.flatMap(doc => [{ index: { _index: es_index, _type: 'patients' } }, doc]);
+    if (program.field_value) {
+        var field_values = program.field_value.split(';');
+
+        for (const [k, v] of Object.entries(field_values)) {
+            var [field, value] = v.split('=');
+            sample = sample
+                .map(doc => { doc[field] = value; return doc })
+        }
+    }
+
+    const body = sample
+        .flatMap(doc => [{ index: { _index: es_index, _type: program.doc_type || null } }, doc]);
 
     const chunks = chunkArray(body, 1000);
 

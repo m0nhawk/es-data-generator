@@ -9,13 +9,15 @@
 Usage: main [options]
 
 Options:
-  -v, --verbose              verbose output
-  -h, --hostname <hostname>  elasticsearch hostname (default: "http://localhost")
-  -p, --port <port>          elasticsearch port (default: "9200")
-  -i, --index <index>        elasticsearch index
-  -n, --number <number>      number of documents to generate (default: 100)
-  -r, --random               generate random number of document up to "number" (default: false)
-  -h, --help                 output usage information
+  -v, --verbose                verbose output
+  -h, --hostname <hostname>    elasticsearch hostname (default: "http://localhost")
+  -p, --port <port>            elasticsearch port (default: "9200")
+  -i, --index <index>          elasticsearch index
+  -d, --doc_type <doc_type>    document type (default: null)
+  --field_value <field_value>  field value (default: null)
+  -n, --number <number>        number of documents to generate (default: 100)
+  -r, --random                 generate random number of document up to "number" (default: false)
+  -h, --help                   output usage information
 ```
 
 ## Issue tracker

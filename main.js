@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-'use strict'
+'use strict';
 
 const program = require('commander');
 const { Client } = require('@elastic/elasticsearch');
@@ -10,8 +10,7 @@ const { faker_type } = require('./src/types');
 
 program
     .option('-v, --verbose', 'verbose output')
-    .option('-h, --hostname <hostname>', 'elasticsearch hostname', 'http://localhost')
-    .option('-p, --port <port>', 'elasticsearch port', '9200')
+    .option('-h, --host <host>', 'elasticsearch hostname', 'http://localhost:9200')
     .option('-i, --index <index>', 'elasticsearch index')
     .option('-d, --doc_type <doc_type>', 'document type', null)
     .option('--field_value <field_value>', 'field value', null)
@@ -20,46 +19,40 @@ program
 
 program.parse(process.argv);
 
-// console.log(program);
+async function run(program) {
+    const es_host = program.host;
+    const es_index = program.index;
+    const doc_type = program.doc_type || '_doc';
 
-const es_host = `${program.hostname}:${program.port}`;
-const es_index = program.index;
+    const client = new Client({ node: es_host });
 
-// https://github.com/json-schema-faker/json-schema-faker
-// https://json-schema.org/understanding-json-schema/reference/array.html
+    // client.info(console.log);
 
-const client = new Client({ node: es_host });
+    var min, max;
 
-var min, max;
-
-if (program.random) {
-    min = 1;
-    max = program.number;
-} else {
-    min = program.number;
-    max = program.number;
-}
-
-const schema = {
-    type: 'array',
-    items: {
-        type: 'object',
-        properties: {
-        },
-        required: [],
-    },
-    minItems: min,
-    maxItems: max,
-}
-
-async function run() {
-    var mapping = await client.indices.getMapping({ index: es_index });
-
-    var m = mapping.body[es_index].mappings;
-
-    if (program.doc_type) {
-        m = m[program.doc_type];
+    if (program.random) {
+        min = 1;
+        max = program.number;
+    } else {
+        min = program.number;
+        max = program.number;
     }
+
+    const schema = {
+        type: 'array',
+        items: {
+            type: 'object',
+            properties: {
+            },
+            required: [],
+        },
+        minItems: min,
+        maxItems: max,
+    }
+
+    const mapping = await client.indices.getMapping({ index: es_index, include_type_name: true });
+
+    const m = mapping.body[es_index].mappings[doc_type];
 
     for (const [key, value] of Object.entries(m.properties)) {
         var fieldType = faker_type(value);
@@ -80,7 +73,7 @@ async function run() {
     }
 
     const body = sample
-        .flatMap(doc => [{ index: { _index: es_index, _type: program.doc_type || null } }, doc]);
+        .flatMap(doc => [{ index: { _index: es_index, _type: doc_type } }, doc]);
 
     const chunks = chunkArray(body, 1000);
 
@@ -115,6 +108,7 @@ async function run() {
     };
 }
 
-run().catch(function (error) {
+run(program).catch(function (error) {
     console.log(error);
+    console.log(error.meta.body.error);
 });

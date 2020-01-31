@@ -26,7 +26,6 @@ function faker_type(value) {
             fieldType = { type: "array", items: { type: "object", properties: properties, required: required }, minItems: 10, maxItems: 10 }
             break;
         default:
-            // console.log(value);
             break;
     }
     return fieldType

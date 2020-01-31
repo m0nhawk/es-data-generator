@@ -2,16 +2,21 @@
   "name": "@qed/es-data-gen-js",
   "version": "1.0.0",
   "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/m0nhawk/es-data-generator.git"
+  },
   "main": "main.js",
   "dependencies": {
     "@elastic/elasticsearch": "^7.3.0",
     "commander": "^3.0.1",
-    "json-schema-faker": "github:json-schema-faker/json-schema-faker#develop"
+    "json-schema-faker": "^0.5.0-rc23"
   },
   "devDependencies": {},
   "scripts": {
+    "es": "node main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "MIT"
 }
